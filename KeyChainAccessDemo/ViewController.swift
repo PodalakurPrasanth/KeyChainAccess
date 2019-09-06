@@ -8,6 +8,8 @@
 
 import UIKit
 
+var startDate:Date?
+
 class ViewController: UIViewController {
 
     @IBOutlet weak var userNameTextField: UITextField!
@@ -19,7 +21,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        startDate = Date()
     }
     // will only work after
     @IBAction func updatePassword(_ sender: Any) {
@@ -42,6 +44,36 @@ class ViewController: UIViewController {
         }
         else {passwordTextField.text = "Password does not exist" }
     }
+    
+     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        let endDate = Date()
+        self.isSessionExpired(start: startDate!, end: endDate)
+    }
 
 }
 
+//MARK:- for session expiration
+extension UIViewController{
+    func isSessionExpired(start: Date, end: Date){
+        
+        if self.getDateDiff(start: start, end: end) >= 15 {
+            let alert = UIAlertController(title: "", message: "Session Warning...!", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (warningAction) in
+                print("Seesion Expired")
+                startDate = end
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }else{
+            startDate = end
+            
+        }
+    }
+    func getDateDiff(start: Date, end: Date) -> Int  {
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents([Calendar.Component.second], from: start, to: end)
+        
+        let seconds = dateComponents.second
+        return Int(seconds!)
+    }
+}
